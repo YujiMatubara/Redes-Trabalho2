@@ -43,20 +43,21 @@ std::vector<bool> Receiver::linkLayer(int chosenErrorDetecAlg, vector<bool> fina
     int flag3 = finalFrame.remove(finalFrame.end(), frameFlag.begin(), frameFlag.end());
 
     // Choosing error detection algorithm
-    switch(chosenErrorDetecAlg):
+    switch (chosenErrorDetecAlg)
+    {
         case 0:
             CRC_32(); // A ATUALIZAR
-            break;
+        break;
         case 1: // even bit parity
             bitParityDecoding(true);
-            break;
+        break;
         case 2: // odd bit parity
             bitParityDencoding(false);
-            break;
+        break;
         default:
             std::cerr << "[ATENÇÃO] Método de correção de erro inválido. Escolha entre 0 e 2!\n";
-
-
+    }
+        
     // returning to receive to "application layer"
     return finalFrame;
 }

@@ -99,18 +99,20 @@ void Sender::CRC_32() {
 
 std::vector<bool> Sender::linkLayer(int chosenErrorDetecAlg) {
     // Choosing error detection algorithm
-    switch(chosenErrorDetecAlg):
+    switch (chosenErrorDetecAlg)
+    {
         case 0:
             CRC_32();
-            break;
+        break;
         case 1: // even bit parity
             bitParityEncoding(true);
-            break;
+        break;
         case 2: // odd bit parity
             bitParityEncoding(false);
-            break;
+        break;
         default:
             std::cerr << "[ATENÇÃO] Método de correção de erro inválido. Escolha entre 0 e 2!\n";
+    }
 
     // Framing: inserting frameFlag to beginning and end of frame (variable size)
     std::vector<bool> finalFrame; // frame we'll send to physical layer
