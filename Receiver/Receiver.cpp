@@ -1,5 +1,9 @@
 #include "Receiver.hpp"
 
+Receiver::Receiver(){}
+
+Receiver::~Receiver(){}
+
 int Receiver::applicationLayer(std::string message, std::vector<bool> inputBits) {
 
     std::cout << "Mensagem recebida:\n";
@@ -38,9 +42,9 @@ void Receiver::bitParityDecoding(bool evenBitParity = true){
 */
 std::vector<bool> Receiver::linkLayer(int chosenErrorDetecAlg, std::vector<bool> finalFrame) {
     // Framing: removing frameFlag to beginning and end of frame (variable size)
-    int flag1 = finalFrame.remove(finalFrame.end(), frameFlag.begin(), frameFlag.end());
-    int flag2 = finalFrame.remove(finalFrame.end(), outputBits.begin(), outputBits.end());
-    int flag3 = finalFrame.remove(finalFrame.end(), frameFlag.begin(), frameFlag.end());
+    //int flag1 = finalFrame.remove(finalFrame.end(), frameFlag.begin(), frameFlag.end());
+    //int flag2 = finalFrame.remove(finalFrame.end(), outputBits.begin(), outputBits.end());
+    //int flag3 = finalFrame.remove(finalFrame.end(), frameFlag.begin(), frameFlag.end());
 
     // Choosing error detection algorithm
     switch (chosenErrorDetecAlg)
@@ -49,10 +53,10 @@ std::vector<bool> Receiver::linkLayer(int chosenErrorDetecAlg, std::vector<bool>
             //CRC_32(); // A ATUALIZAR
         break;
         case 1: // even bit parity
-            bitParityDecoding(true);
+            bitParityDecoding();
         break;
         case 2: // odd bit parity
-            bitParityDencoding(false);
+            bitParityDecoding(false);
         break;
         default:
             std::cerr << "[ATENÇÃO] Método de correção de erro inválido. Escolha entre 0 e 2!\n";

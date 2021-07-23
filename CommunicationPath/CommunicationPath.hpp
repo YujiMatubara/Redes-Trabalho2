@@ -1,5 +1,5 @@
 #pragma once
-#include "Global.hpp"
+#include "../Global.hpp"
 
 class CP {
     private:
@@ -8,4 +8,4 @@ class CP {
         CP();
         ~CP();
         void Error(std::vector<bool> inputBits);
-}
+};

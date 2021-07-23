@@ -1,14 +1,16 @@
 #include "Sender.hpp"
 
 Sender::Sender(){}
+Sender::~Sender(){}
 
 std::string Sender::stringToBinary(std::string str) {
+    std::string binRepresentation;
     for (int i = 0; i <= (int)str.length(); i++) {
         // convert each char to ASCII value
         int asciiVal = int(str[i]);
 
         // Convert ASCII value to binary
-        std::string binRepresentation = "";
+        binRepresentation = "";
         while (asciiVal > 0) {
             (asciiVal % 2) ? binRepresentation.push_back('1') : binRepresentation.push_back('0');
             asciiVal /= 2;
@@ -19,10 +21,11 @@ std::string Sender::stringToBinary(std::string str) {
         
         std::reverse(binRepresentation.begin(), binRepresentation.end());
 
-        printf("Done! Converted %s to %s\n", str, binRepresentation);
+        std::cout << "Done! Converted " << str << "to " << binRepresentation << std::endl;
 
-        return binRepresentation;
+       
     }
+    return binRepresentation;
 }
 
 void Sender::applicationLayer() {
@@ -62,7 +65,7 @@ void Sender::bitParityEncoding(bool evenBitParity = true){
 }
 
 
-
+/*
 void Sender::CRC_32() {
     int crcSize = CRC_DIVISOR.size();
 
@@ -97,17 +100,17 @@ void Sender::CRC_32() {
     std::cout << "Bit sequence after CRC applied:\n\t" << inputBits << std::endl;
     
     return;
-}
+}*/
 
 std::vector<bool> Sender::linkLayer(int chosenErrorDetecAlg) {
     // Choosing error detection algorithm
     switch (chosenErrorDetecAlg)
     {
         case 0:
-            CRC_32();
+            //CRC_32();
         break;
         case 1: // even bit parity
-            bitParityEncoding(true);
+            bitParityEncoding();
         break;
         case 2: // odd bit parity
             bitParityEncoding(false);

@@ -1,5 +1,5 @@
 #pragma once
-#include "Global.hpp"
+#include "../Global.hpp"
 
 class Receiver {
     private:

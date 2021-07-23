@@ -1,13 +1,13 @@
-make all: CommunicationPath.o Receiver.o Sender.o main.o
-	g++ -Wall CommunicationPath.o Receiver.o Sender.o -o Simulation
+make all: CommunicationPath.o Receiver.o Sender.o Main.o
+	g++ -Wall CommunicationPath.o Receiver.o Sender.o Main.o -o Simulation
 
-main.o: main.cpp global.hpp
-	g++ -c main.cpp
+Main.o: Main.cpp Global.hpp
+	g++ -c Main.cpp
 
 CommunicationPath.o: CommunicationPath/CommunicationPath.cpp CommunicationPath/CommunicationPath.hpp Global.hpp
 	g++ -c CommunicationPath/CommunicationPath.cpp
 
-Receiver.o: Receiver/Receiver.cpp Receiver/Receiver.hpp Receiver/socketServer.hpp Global.hpp
+Receiver.o: Receiver/Receiver.cpp Receiver/Receiver.hpp Global.hpp
 	g++ -c Receiver/Receiver.cpp
 
 Sender.o: Sender/Sender.cpp Sender/Sender.hpp Global.hpp
