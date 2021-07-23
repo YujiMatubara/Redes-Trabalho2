@@ -51,15 +51,17 @@ void Sender::bitParityEncoding(bool evenBitParity = true){
         auxBits.push_back(lastBool);
         bitSum += lastBool ? 1 : 0;
         if(it%PARITY_RANGE == 0){
-            inputBits.push_back(bitSum%2 == evenBitParity);
+            auxBits.push_back(bitSum%2 == evenBitParity);
             bitSum = 0;
         }        
     }
-    if(inputBits.size()%PARITY_RANGE != 0) inputBits.push_back(bitSum%2 == evenBitParity);
+    if(inputBits.size()%PARITY_RANGE != 0) auxBits.push_back(bitSum%2 == evenBitParity);
     std::reverse(auxBits.begin(),auxBits.end());
     inputBits = auxBits;
     return;
 }
+
+
 
 void Sender::CRC_32() {
     int crcSize = CRC_DIVISOR.size();
@@ -74,7 +76,7 @@ void Sender::CRC_32() {
     // Append inputBits vector to aux vector
     aux.insert(aux.end(), inputBits.begin(), inputBits.end());
 
-    for (int i = aux.size()-1; i >= 0 + crcSize; i--) { // Begins with the crcSize most significant bits from the message
+    for (int i = aux.size() - 1; i >= 0 + crcSize; i--) { // Begins with the crcSize most significant bits from the message
         for (int j = i; j >= crcSize; j--) { // makes XOR division bit by bit for crcSize bits
             aux[j] ^= CRC_DIVISOR[j];
         }

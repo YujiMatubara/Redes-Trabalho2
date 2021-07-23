@@ -36,7 +36,7 @@ void Receiver::bitParityDecoding(bool evenBitParity = true){
 /*
     OBS: CONFERIR AS FLAGS NO REMOVE
 */
-std::vector<bool> Receiver::linkLayer(int chosenErrorDetecAlg, vector<bool> finalFrame) {
+std::vector<bool> Receiver::linkLayer(int chosenErrorDetecAlg, std::vector<bool> finalFrame) {
     // Framing: removing frameFlag to beginning and end of frame (variable size)
     int flag1 = finalFrame.remove(finalFrame.end(), frameFlag.begin(), frameFlag.end());
     int flag2 = finalFrame.remove(finalFrame.end(), outputBits.begin(), outputBits.end());
@@ -46,7 +46,7 @@ std::vector<bool> Receiver::linkLayer(int chosenErrorDetecAlg, vector<bool> fina
     switch (chosenErrorDetecAlg)
     {
         case 0:
-            CRC_32(); // A ATUALIZAR
+            //CRC_32(); // A ATUALIZAR
         break;
         case 1: // even bit parity
             bitParityDecoding(true);
