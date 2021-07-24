@@ -11,5 +11,5 @@ class Sender {
         std::string stringToBinary(std::string str);
         std::vector<bool> linkLayer(int chosenErrorDetecAlg);
         void bitParityEncoding(bool evenBitParity);
-        //void CRC_32();
+        void CRC_32();
 };

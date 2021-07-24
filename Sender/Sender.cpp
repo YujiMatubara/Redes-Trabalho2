@@ -1,31 +1,36 @@
 #include "Sender.hpp"
+#include "Global.hpp"
 
 Sender::Sender(){}
 Sender::~Sender(){}
 
 std::string Sender::stringToBinary(std::string str) {
-    std::string binRepresentation;
-    for (int i = 0; i <= (int)str.length(); i++) {
+    std::string binRepresentation = "";
+    std::string finalBinary = "";
+
+    for (int i = 0; i < (int)str.length(); i++) {
+        binRepresentation = "";
+
         // convert each char to ASCII value
         int asciiVal = int(str[i]);
 
         // Convert ASCII value to binary
-        binRepresentation = "";
         while (asciiVal > 0) {
             (asciiVal % 2) ? binRepresentation.push_back('1') : binRepresentation.push_back('0');
             asciiVal /= 2;
         }
 
-        while (binRepresentation.length() < 8) // each char must have a 8-bit representation
+        while ((int)binRepresentation.length() < 8) // each char must have a 8-bit representation
             binRepresentation.push_back('0');
         
         std::reverse(binRepresentation.begin(), binRepresentation.end());
 
-        std::cout << "Done! Converted " << str << "to " << binRepresentation << std::endl;
+        std::cout << "Done! Converted until '" << str[i] << "': " << binRepresentation << std::endl;
 
-       
+        finalBinary += binRepresentation;
     }
-    return binRepresentation;
+    std::cout << "Done! Converted evertything: " << finalBinary << std::endl;
+    return finalBinary;
 }
 
 void Sender::applicationLayer() {
@@ -38,8 +43,96 @@ void Sender::applicationLayer() {
     std::string binMsg = stringToBinary(message);
 
     for (int i = 0; i < (int)binMsg.length(); i++)
-        inputBits.push_back((binMsg[0] == '1') ? 1 : 0);
+        inputBits.push_back( (binMsg[i] == '1') ? 1 : 0 );
+    
+    std::cout << "Input bits:\n";
 
+    for (int i = 0; i < (int)inputBits.size(); i++)
+        std::cout << inputBits[i];
+    std::cout << std::endl;
+
+    return;
+}
+
+void Sender::CRC_32() {
+    int crcSize = CRC_DIVISOR.size();
+
+    if (crcSize == 0) {
+        std::cerr << "[ERRO] Não é possível usar CRC com divisor de tamanho 0!\n";
+        return;
+    }
+
+    // Aux vectors to use during XOR operations
+    std::vector<bool> aux;
+    
+    // Append inputBits vector to aux vector
+    aux.insert(aux.end(), inputBits.begin(), inputBits.end());
+    
+    // Insert zeroes to end of bit vector
+    for (int i = 0; i < crcSize-1; i++)
+        aux.push_back(0);
+    
+
+    // Could use a more efficient algorithm...
+    for (int i = 0; i <= (int)aux.size() - crcSize; i++) { // Begins with the crcSize most significant bits from the message
+        int crcIndex = 0;
+        // std::cout << "\nAux vector before:\n";
+
+        // for (int i = 0; i < (int)aux.size(); i++)
+        //     std::cout << aux[i];
+        // std::cout << std::endl;
+        
+        if (aux[i] == 0) { // if most significant bit of the last "remainder" is 0, XOR with 00000...000
+            for (int j = i; j < i+crcSize; j++) { // makes XOR division bit by bit for crcSize bits
+                // printf("j = %d: %d ^ 0\n", j, (aux[j]) ? 1 : 0);
+                aux[j] = aux[j] ^ 0;
+            }
+        }
+        else { // XOR with CRC divisor
+            for (int j = i; j < i+crcSize; j++) { // makes XOR division bit by bit for crcSize bits
+                // printf("j = %d: %d ^ %d\n", j, (aux[j]) ? 1 : 0, (CRC_DIVISOR[crcIndex]) ? 1 : 0 ); 
+                aux[j] = aux[j] ^ CRC_DIVISOR[crcIndex];
+                crcIndex++;
+            }
+        }
+        // std::cout << std::endl;
+
+        // std::cout << "Aux vector after:\n";
+
+        // for (int i = 0; i < (int)aux.size(); i++)
+        //     std::cout << aux[i];
+        // std::cout << std::endl;
+    }
+
+    std::vector<bool> bitsCRC(crcSize-1);
+
+    std::cout << "Aux vector after CRC algo.:\n";
+
+    for (int i = 0; i < (int)aux.size(); i++)
+        std::cout << aux[i];
+    std::cout << std::endl;
+
+    // crcSize-1 least significant bits are the ones we need to append to the message
+    for (int i = 0; i < crcSize-1; i++) {
+        bitsCRC[i] = aux[inputBits.size() + i];
+    }
+    
+    std::cout << "CRC bits defined:\n";
+
+    for (int i = 0; i < (int)bitsCRC.size(); i++)
+        std::cout << bitsCRC[i];
+    std::cout << std::endl;
+
+    std::vector<bool> aux2 = inputBits;
+    aux2.insert(aux2.end(), bitsCRC.begin(), bitsCRC.end());
+    inputBits = aux2;
+
+    std::cout << "Bit sequence after CRC applied:\n";
+
+    for (int i = 0; i < (int)inputBits.size(); i++)
+        std::cout << inputBits[i];
+    std::cout << std::endl;
+    
     return;
 }
 
@@ -63,44 +156,6 @@ void Sender::bitParityEncoding(bool evenBitParity = true){
     inputBits = auxBits;
     return;
 }
-
-
-/*
-void Sender::CRC_32() {
-    int crcSize = CRC_DIVISOR.size();
-
-    if (crcSize == 0) {
-        std::cerr << "[ERRO] Não é possível usar CRC com divisor de tamanho 0!\n";
-        return;
-    }
-
-    // Aux vector to make XOR operations
-    std::vector<bool> aux(0, crcSize-1);
-    // Append inputBits vector to aux vector
-    aux.insert(aux.end(), inputBits.begin(), inputBits.end());
-
-    for (int i = aux.size() - 1; i >= 0 + crcSize; i--) { // Begins with the crcSize most significant bits from the message
-        for (int j = i; j >= crcSize; j--) { // makes XOR division bit by bit for crcSize bits
-            aux[j] ^= CRC_DIVISOR[j];
-        }
-    }
-
-    std::vector<bool> bitsCRC(crcSize-1);
-
-    // crcSize-1 least significant bits are the ones we need to append to the message
-    for (int i = 0; i < crcSize; i++)
-        bitsCRC[i] = aux[i]; 
-    
-    std::cout << "CRC bits defined:\n\t" << bitsCRC << std::endl;
-
-    std::vector<bool> aux2 = bitsCRC;
-    aux.insert(aux2.end(), inputBits.begin(), inputBits.end());
-    inputBits = aux2;
-
-    std::cout << "Bit sequence after CRC applied:\n\t" << inputBits << std::endl;
-    
-    return;
-}*/
 
 std::vector<bool> Sender::linkLayer(int chosenErrorDetecAlg) {
     // Choosing error detection algorithm
