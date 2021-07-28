@@ -41,6 +41,9 @@ void Receiver::bitParityDecoding(bool evenBitParity = true){
         }
     }
     bitSum += outputBits.at((int)outputBits.size() - 1) ? 1 : 0;
+
+    /* Prints the blocks of bits, when the parity is correct the color is green, when is wrong
+    the color is green. Parity bit is always white */
     wrongBlocks.push_back(bitSum%2 == evenBitParity); 
     errors += block ? 1 : 0;
     int curParityPos;
@@ -60,7 +63,7 @@ void Receiver::bitParityDecoding(bool evenBitParity = true){
     std::cout << message << std::endl;
     std::vector<bool> auxVector;
     for(int i=1; i<=outputBits.size();i++){
-        // Verify if the last block needs the parity bit
+        // Verify if have to insert the last block (without parity bit) into the decoded vector
         if(i%addedParityRange != 0) auxVector.push_back(outputBits.at(i-1));
     }
     
@@ -119,15 +122,21 @@ void Receiver::CRC_32(std::vector<bool> outputBits) {
     return;
 }
 
-/*
 std::string Receiver::getColoredMessage(std::string sentMessage){
     std::string coloredMessage = "";
     for(int i=0;i<sentMessage.size();i++){
-        //coloredMessage += (sentMessage[i] == receivedMessage[i] ? receivedMessage[i] : ("\x1B[31m" + receivedMessage[i] + "\033[0m"));
+        if(sentMessage[i] == receivedMessage[i]){
+            coloredMessage += receivedMessage[i];
+        }
+        else{
+            coloredMessage += "\x1B[31m";
+            coloredMessage += receivedMessage[i];
+            coloredMessage += "\033[0m";
+        }
     }
 
-    return receivedMessage;
-}*/
+    return coloredMessage;
+}
 
 void Receiver::linkLayer(int chosenErrorDetecAlg) {
     // Framing: removing frameFlag to beginning and end of frame (variable size)
