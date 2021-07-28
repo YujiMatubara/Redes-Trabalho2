@@ -1,5 +1,6 @@
 #pragma once
 #include "../Global.hpp"
+#include <time.h>
 
 class CP {
     private:

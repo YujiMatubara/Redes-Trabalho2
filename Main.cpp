@@ -5,6 +5,8 @@
 
 /* Simulates the whole interaction between sender and receiver sending a binary message with
 some flags to verification */
+
+
 int main(int argc, char const *argv[]) {
     Sender sender;
     Receiver receiver;
@@ -34,7 +36,9 @@ int main(int argc, char const *argv[]) {
 
     // The receiver functions starts here
     receiver.applicationLayer(senderFrame);
-    receiver.linkLayer(encodingType);
-
-    return 0;
+    receiver.linkLayer(encodingType);/*
+    std::string sentMessage = sender.getMessage();
+    std::string receivedMessage = sender.getColoredMessage(sentMessage);
+    std::cout << "Mensagens:\n\tEnviada: " << sentMessage << "\n\tRecebida: " << receivedMessage << std::endl;
+    */return 0;
 }

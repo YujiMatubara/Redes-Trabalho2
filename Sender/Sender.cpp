@@ -9,6 +9,7 @@ std::string Sender::stringToBinary(std::string str) {
     std::string binRepresentation = "";
     std::string finalBinary = "";
 
+    // Walks through the whole string
     for (int i = 0; i < (int)str.length(); i++) {
         binRepresentation = "";
 
@@ -53,8 +54,13 @@ void Sender::applicationLayer() {
     for (int i = 0; i < (int)inputBits.size(); i++)
         std::cout << inputBits[i];
     std::cout << std::endl;
+    sentMessage = message;
 
     return;
+}
+
+std::string Sender::getMessage(){
+    return sentMessage;
 }
 
 // CRC encoding for verification
@@ -140,22 +146,27 @@ void Sender::CRC_32() {
     return;
 }
 
-
-// Encoding for even and odd parity, set with the parameter
+// Encoding for even and odd parity, set with the parameter eventBitParity
 void Sender::bitParityEncoding(bool evenBitParity = true){
     int bitSum = 0;
     std::vector<bool> auxBits;
     bool lastBool;
+
+    // Fills the bitSum vector with the blocks of bits that will get the parity bit
     for(int i = 0; i < (int)inputBits.size();i++){
         lastBool = inputBits.at(i);
         auxBits.push_back(lastBool);
         bitSum += lastBool ? 1 : 0;
+        // Add the parity bit at the end of the partial block
         if((i+1)%PARITY_RANGE == 0){
             auxBits.push_back(bitSum%2 == evenBitParity);
             bitSum = 0;
         }
     }
+    // Verify if the last block needs the parity bit
     if(inputBits.size()%PARITY_RANGE != 0) auxBits.push_back(bitSum%2 == evenBitParity);
+
+    // Update inputBits vector
     inputBits = auxBits;
     return;
 }
@@ -166,7 +177,7 @@ std::vector<bool> Sender::linkLayer(int chosenErrorDetecAlg) {
     switch (chosenErrorDetecAlg)
     {
         case 0:
-            //CRC_32();
+            CRC_32();
         break;
         case 1: // even bit parity
             bitParityEncoding();
