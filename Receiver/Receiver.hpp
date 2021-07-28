@@ -14,6 +14,6 @@ class Receiver {
     void applicationLayer(std::vector<bool> outputBits);
     void bitParityDecoding(bool evenBitParity);
     void linkLayer(int chosenErrorDetecAlg);
-    void CRC_32(std::vector<bool> outputBits);
+    int CRC_32(std::vector<bool> outputBits);
     
 };

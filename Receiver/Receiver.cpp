@@ -73,13 +73,13 @@ void Receiver::bitParityDecoding(bool evenBitParity = true){
     return;
 }
 
-// CRC decoding for verification
-void Receiver::CRC_32(std::vector<bool> outputBits) {
+// CRC decoding for verification, returns the real size of the message
+int Receiver::CRC_32(std::vector<bool> outputBits) {
     int crcSize = CRC_DIVISOR.size();
 
     if (crcSize == 0) {
         std::cerr << "[ERRO] Não é possível usar CRC com divisor de tamanho 0!\n";
-        return;
+        return -1;
     }
 
     // Aux vector to capture the crc flag
@@ -124,7 +124,7 @@ void Receiver::CRC_32(std::vector<bool> outputBits) {
     }
     std::cout << std::endl;
 
-    return;
+    return (int)aux.size() - crcSize + 1;
 }
 
 std::string Receiver::getColoredMessage(std::string sentMessage){
@@ -147,6 +147,7 @@ void Receiver::linkLayer(int chosenErrorDetecAlg) {
     // Framing: removing frameFlag to beginning and end of frame (variable size)
     // Removes flags from begining and end
 
+    int msgSize = 0; // Used only in CRC function
     std::vector<bool>::const_iterator first = outputBits.begin();   //iterator that begins the subvector
     std::vector<bool>::const_iterator last = outputBits.begin() + 8;    //iterator that ends the subvector
     std::vector<bool> beginCheck(first, last);  //create the begin flag
@@ -180,7 +181,7 @@ void Receiver::linkLayer(int chosenErrorDetecAlg) {
     switch (chosenErrorDetecAlg)
     {
         case 0: //crc-32
-            CRC_32(outputBits);
+            msgSize = CRC_32(outputBits);
         break;
         case 1: // even bit parity
             bitParityDecoding();
@@ -194,12 +195,16 @@ void Receiver::linkLayer(int chosenErrorDetecAlg) {
 
     std::cout << "\n";
 
+    // msgSize is calculated with different ways between CRC and bit parity
+    if(chosenErrorDetecAlg != 0)
+        msgSize = outputBits.size();
+
     // Print the decoded message
-    if(outputBits.size()%PARITY_RANGE != 0) {
+    if(msgSize%PARITY_RANGE != 0) {
         std::cout << "ERROR: some bits are missing\n";
         return;
     }
-    std::cout << "Message size: " << outputBits.size()/PARITY_RANGE << " chars!\n";
+    std::cout << "Message size: " << msgSize/PARITY_RANGE << " chars!\n";
     
     // Convert blocks of 8 bits in chars, and print each one
     int binToInt = 0;
@@ -207,7 +212,8 @@ void Receiver::linkLayer(int chosenErrorDetecAlg) {
     
     //transform the binary sequence into a char string
     receivedMessage = "";
-    for(int i = 0; i < outputBits.size(); i++) {    //iterates the message getted
+    
+    for(int i = 0; i < msgSize; i++) {    //iterates the message getted
 
         if(outputBits[i] == 1)
             binToInt += pot;
