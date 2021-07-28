@@ -7,5 +7,5 @@ class CP {
     public:
         CP();
         ~CP();
-        void Error(std::vector<bool> inputBits);
+        void Error(std::vector<bool>& inputBits);
 };

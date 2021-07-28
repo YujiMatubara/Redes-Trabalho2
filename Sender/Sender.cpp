@@ -1,9 +1,10 @@
 #include "Sender.hpp"
-#include "Global.hpp"
+#include "../Global.hpp"
 
 Sender::Sender(){}
 Sender::~Sender(){}
 
+// Converts a String input into a string of 0 and 1 (it will work as a binary message)
 std::string Sender::stringToBinary(std::string str) {
     std::string binRepresentation = "";
     std::string finalBinary = "";
@@ -23,6 +24,7 @@ std::string Sender::stringToBinary(std::string str) {
         while ((int)binRepresentation.length() < 8) // each char must have a 8-bit representation
             binRepresentation.push_back('0');
         
+        // Reverse the string for the next steps
         std::reverse(binRepresentation.begin(), binRepresentation.end());
 
         std::cout << "Done! Converted until '" << str[i] << "': " << binRepresentation << std::endl;
@@ -33,6 +35,7 @@ std::string Sender::stringToBinary(std::string str) {
     return finalBinary;
 }
 
+// Read the input, transform into a 0 and 1 string and so convert it to a bool vector
 void Sender::applicationLayer() {
     std::string message;
 
@@ -42,11 +45,11 @@ void Sender::applicationLayer() {
     // Simulating converting from string to binary
     std::string binMsg = stringToBinary(message);
 
+    // Transform the string into a bool vector
     for (int i = 0; i < (int)binMsg.length(); i++)
         inputBits.push_back( (binMsg[i] == '1') ? 1 : 0 );
     
     std::cout << "Input bits:\n";
-
     for (int i = 0; i < (int)inputBits.size(); i++)
         std::cout << inputBits[i];
     std::cout << std::endl;
@@ -54,6 +57,7 @@ void Sender::applicationLayer() {
     return;
 }
 
+// CRC encoding for verification
 void Sender::CRC_32() {
     int crcSize = CRC_DIVISOR.size();
 
@@ -136,27 +140,27 @@ void Sender::CRC_32() {
     return;
 }
 
+
+// Encoding for even and odd parity, set with the parameter
 void Sender::bitParityEncoding(bool evenBitParity = true){
     int bitSum = 0;
     std::vector<bool> auxBits;
     bool lastBool;
-    int it = 0;
-    for(int i = (int)inputBits.size() - 1; i >= 0; i--){
-        it++;
+    for(int i = 0; i < (int)inputBits.size();i++){
         lastBool = inputBits.at(i);
         auxBits.push_back(lastBool);
         bitSum += lastBool ? 1 : 0;
-        if(it%PARITY_RANGE == 0){
+        if((i+1)%PARITY_RANGE == 0){
             auxBits.push_back(bitSum%2 == evenBitParity);
             bitSum = 0;
-        }        
+        }
     }
     if(inputBits.size()%PARITY_RANGE != 0) auxBits.push_back(bitSum%2 == evenBitParity);
-    std::reverse(auxBits.begin(),auxBits.end());
     inputBits = auxBits;
     return;
 }
 
+// Run the link layer for the sender
 std::vector<bool> Sender::linkLayer(int chosenErrorDetecAlg) {
     // Choosing error detection algorithm
     switch (chosenErrorDetecAlg)
@@ -173,6 +177,11 @@ std::vector<bool> Sender::linkLayer(int chosenErrorDetecAlg) {
         default:
             std::cerr << "[ATENÇÃO] Método de correção de erro inválido. Escolha entre 0 e 2!\n";
     }
+
+    std::cout << "Texto com encoding e sem frame\n";
+    for (int i = 0; i < (int)inputBits.size(); i++)
+        std::cout << inputBits[i];
+    std::cout << "\n";
 
     // Framing: inserting frameFlag to beginning and end of frame (variable size)
     std::vector<bool> finalFrame; // frame we'll send to physical layer

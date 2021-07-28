@@ -1,13 +1,18 @@
 #include "CommunicationPath.hpp"
 
+//constructor and destructor empty
 CP::CP(){}
 CP::~CP(){}
-void Error(std::vector<bool> inputBits)
+
+/* when the message is in the link layer, some errors ocurrs, this class simulates these
+    erros changing some bits of the message with the rand() function */
+void CP::Error(std::vector<bool>& inputBits)
 {
-    double errorpercent = ERROR_PROB;  //error probability
-    for (int i = 0; i < inputBits.size() - 1; i++) {
-        if (!rand()%100 > errorpercent)
-            inputBits[i] = !inputBits[i];
+    for (int i = 0; i < inputBits.size(); i++) {    //iterates in inputBits
+        if (rand()%100 < ERROR_PROB){   //when the rand is inside [0, ERROR_PROB]
+            inputBits[i] = !inputBits[i];   //change the boolean vector in i to the oposite value
+        }
     }
+
     return;
 }

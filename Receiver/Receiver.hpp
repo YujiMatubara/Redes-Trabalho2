@@ -8,8 +8,8 @@ class Receiver {
     public:
     Receiver();
     ~Receiver();
-    int applicationLayer(std::string message, std::vector<bool> inputBits);
+    void applicationLayer(std::vector<bool> outputBits);
     void bitParityDecoding(bool evenBitParity);
-    std::vector<bool> linkLayer(int chosenErrorDetecAlg, std::vector<bool> finalFrame);
+    void linkLayer(int chosenErrorDetecAlg);
     
 };
