@@ -77,12 +77,15 @@ void Receiver::bitParityDecoding(bool evenBitParity = true){
 void Receiver::CRC_32(std::vector<bool> outputBits) {
     int crcSize = CRC_DIVISOR.size();
 
+    if (crcSize == 0) {
+        std::cerr << "[ERRO] Não é possível usar CRC com divisor de tamanho 0!\n";
+        return;
+    }
+
     // Aux vector to capture the crc flag
     std::vector<bool> aux = outputBits;
 
-    //std::reverse(aux.begin(), aux.end());
     
-    // Could use a more efficient algorithm...
     for (int i = 0; i <= (int)aux.size() - crcSize; i++) { // Begins with the crcSize most significant bits from the message
         int crcIndex = 0;
         
@@ -103,18 +106,20 @@ void Receiver::CRC_32(std::vector<bool> outputBits) {
 
     std::cout << "Result of CRC-32:\n";
 
-    for (int i = 0; i < (int)aux.size(); i++)   //Print the CRC-32 division
+    for (int i = 0; i < (int)aux.size(); i++) // Print the CRC-32 division
         std::cout << aux[i];
     std::cout << std::endl;
 
-    for (int i = 0; i < (int)aux.size(); i++) {
+    for (int i = (int)aux.size()-1; i > (int)aux.size()-crcSize; i--) {
+        // printf("Checking index %d = ", i);
+        // std::cout << aux[i] << std::endl;
         if (aux[i] != 0) {  //if the result is not 0
-            std::cerr << "O CRC-32 identificou falha na divisão. Sua mensagem possui erros.\n";
+            std::cerr << "O CRC-32 identificou falha na divisão. Bit na posição" << i << " está estranho. Sua mensagem pode possuir erros.\n";
         }
     }
 
     std::cout << "Mensagem:\n"; //print the message without the crc flag
-    for (int i = 0; i < (int)outputBits.size() - crcSize - 1; i++) {
+    for (int i = 0; i <= (int)aux.size() - crcSize; i++) {
         std::cout << outputBits[i];
     }
     std::cout << std::endl;
@@ -154,7 +159,7 @@ void Receiver::linkLayer(int chosenErrorDetecAlg) {
         std::cout << "Tamanhos de flag incompatíveis.\n";
         return;
     }
-    for (int i = 0; i < beginCheck.size(); i++) {   //if the size are the same check if the content is the same
+    for (int i = 0; i < beginCheck.size(); i++) { // if the size are the same check if the content is the same
         if (beginCheck[i] != endCheck[i]) {
             std::cout << "Falha na comparação das flags.\n";
             return;
@@ -204,7 +209,7 @@ void Receiver::linkLayer(int chosenErrorDetecAlg) {
     receivedMessage = "";
     for(int i = 0; i < outputBits.size(); i++) {    //iterates the message getted
 
-        if(outputBits[i] == true)
+        if(outputBits[i] == 1)
             binToInt += pot;
 
         if(pot == 1) {  //if it is a true bollean
