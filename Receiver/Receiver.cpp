@@ -21,18 +21,19 @@ void Receiver::applicationLayer(std::vector<bool> outputBits){
     return;
 }
 
+// Decoding for even and odd parity, set with the parameter eventBitParity
 void Receiver::bitParityDecoding(bool evenBitParity = true){
-    std::cout << "Chegou certo\n";
+    std::cout << "Chegou certo\n";  //if the message was reached
     std::vector<std::vector<bool>> errorGroups;
     int bitSum = 0,errors = 0;
-    wrongBlocks.resize(0);
-    int addedParityRange = PARITY_RANGE + 1;
+    wrongBlocks.resize(0);  //indicates where the error occurs
+    int addedParityRange = PARITY_RANGE + 1;    //parity defined in global
     bool block,currentBit;
 
-    for(int i = 0; i < (int)outputBits.size() - 1; i++){
+    for(int i = 0; i < (int)outputBits.size() - 1; i++){    //iterates in message
         currentBit = outputBits.at(i);
         bitSum += currentBit ? 1 : 0;
-        if((i+1)%addedParityRange == 0){
+        if((i+1)%addedParityRange == 0){    //if the i is the parity flag
             block = (bitSum%2 == evenBitParity);
             wrongBlocks.push_back(block);
             errors += block ? 1 : 0;
@@ -43,7 +44,7 @@ void Receiver::bitParityDecoding(bool evenBitParity = true){
     wrongBlocks.push_back(bitSum%2 == evenBitParity); 
     errors += block ? 1 : 0;
     int curParityPos;
-    std::string message = "";
+    std::string message = "";   //initializate a null string
     std::cout << "Os blocos com erros existentes estão em vermelho e os corretos em verde. Os bits de paridade estão em branco:\n";
     for(int i=0;i<(int)wrongBlocks.size();i++){
         message += (wrongBlocks.at(i) ? "\x1B[31m" : "\x1B[32m" );
@@ -59,8 +60,11 @@ void Receiver::bitParityDecoding(bool evenBitParity = true){
     std::cout << message << std::endl;
     std::vector<bool> auxVector;
     for(int i=1; i<=outputBits.size();i++){
+        // Verify if the last block needs the parity bit
         if(i%addedParityRange != 0) auxVector.push_back(outputBits.at(i-1));
     }
+    
+    // Update outputBits vector
     outputBits = auxVector;
 
     return;

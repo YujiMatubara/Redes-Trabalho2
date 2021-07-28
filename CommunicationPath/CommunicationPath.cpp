@@ -8,8 +8,11 @@ CP::~CP(){}
     erros changing some bits of the message with the rand() function */
 void CP::Error(std::vector<bool>& inputBits)
 {
+    // Creates the seed for pseudo-random numbers
+    srand(time(0));
     for (int i = 0; i < inputBits.size(); i++) {    //iterates in inputBits
-        if (rand()%100 < ERROR_PROB){   //when the rand is inside [0, ERROR_PROB]
+        int r = rand()%100;
+        if (r < ERROR_PROB){   //when the rand is inside [0, ERROR_PROB]
             inputBits[i] = !inputBits[i];   //change the boolean vector in i to the oposite value
         }
     }
