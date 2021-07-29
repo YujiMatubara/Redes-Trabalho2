@@ -8,13 +8,13 @@ Receiver::~Receiver(){}
 void Receiver::applicationLayer(std::vector<bool> outputBits){
     this->outputBits = outputBits;
 
-    std::cout << "Mensagem recebida:\n";
+    std::cout << "Message received:\n";
 
     if (outputBits.size() <= 0)  //if the message is empty
         std::cerr << "[Erro] Não há mensagem.";
     else    //if the message is reached, shows it
         for(bool outputBit : outputBits){   //iterates in outputBits
-            std::cout << (outputBit ? "1" : "0");   //if true print 1, else (false) print 0
+            std::cout << (outputBit ? "1" : "0"); //if true print 1, else (false) print 0
         }
     std::cout << "\n";
     
@@ -23,7 +23,8 @@ void Receiver::applicationLayer(std::vector<bool> outputBits){
 
 // Decoding for even and odd parity, set with the parameter eventBitParity
 void Receiver::bitParityDecoding(bool evenBitParity = true){
-    std::cout << "Chegou certo\n";  //if the message was reached
+    std::cout << "Message arrived at B without errors!\n";  //if the message was reached
+
     std::vector<std::vector<bool>> errorGroups;
     int bitSum = 0,errors = 0;
     wrongBlocks.resize(0);  //indicates where the error occurs
@@ -78,7 +79,7 @@ int Receiver::CRC_32(std::vector<bool> outputBits) {
     int crcSize = CRC_DIVISOR.size();
 
     if (crcSize == 0) {
-        std::cerr << "[ERRO] Não é possível usar CRC com divisor de tamanho 0!\n";
+        std::cerr << "[ERROR] Can't use CRC when CRC divisor's size is 0!\n";
         return -1;
     }
 
@@ -104,8 +105,7 @@ int Receiver::CRC_32(std::vector<bool> outputBits) {
         }
     }
 
-    std::cout << "Result of CRC-32:\n";
-
+    std::cout << "CRC-32's result:\n";
     for (int i = 0; i < (int)aux.size(); i++) // Print the CRC-32 division
         std::cout << aux[i];
     std::cout << std::endl;
@@ -114,11 +114,11 @@ int Receiver::CRC_32(std::vector<bool> outputBits) {
         // printf("Checking index %d = ", i);
         // std::cout << aux[i] << std::endl;
         if (aux[i] != 0) {  //if the result is not 0
-            std::cerr << "O CRC-32 identificou falha na divisão. Bit na posição" << i << " está estranho. Sua mensagem pode possuir erros.\n";
+            std::cerr << "CRC-32 identified problem in the division. Bit at position " << i << " looks odd... Your message may contain errors.\n";
         }
     }
 
-    std::cout << "Mensagem:\n"; //print the message without the crc flag
+    std::cout << "Message (without CRC flag):\n"; //print the message without the crc flag
     for (int i = 0; i <= (int)aux.size() - crcSize; i++) {
         std::cout << outputBits[i];
     }
@@ -157,24 +157,24 @@ void Receiver::linkLayer(int chosenErrorDetecAlg) {
     std::vector<bool> endCheck(first, last);    //create the end flag
 
     if (beginCheck.size() != endCheck.size()) { //when the flags are not equal in size, they are not equal in content
-        std::cout << "Tamanhos de flag incompatíveis.\n";
+        std::cout << "Flags' sizes not equal.\n";
         return;
     }
     for (int i = 0; i < beginCheck.size(); i++) { // if the size are the same check if the content is the same
         if (beginCheck[i] != endCheck[i]) {
-            std::cout << "Falha na comparação das flags.\n";
+            std::cout << "Error when compating flags.\n";
             return;
         }
     }
-    std::cout << "Flag não encontrou erros\n";
+    std::cout << "No problems with the framing bits.\n";
 
     outputBits.erase(outputBits.begin(), outputBits.begin() + 8);   //removing the beginning flag
     outputBits.erase(outputBits.end() - 8, outputBits.end());   //removing the ending flag
-    std::cout << "Removeu a flag, a sequencia agora eh:\n";
+    // std::cout << "Removeu a flag, a sequencia agora eh:\n";
 
-    for (int i = 0; i < (int)outputBits.size(); i++)    //print the message without the flag
-        std::cout << outputBits[i];
-    std::cout << "\n";
+    // for (int i = 0; i < (int)outputBits.size(); i++)    //print the message without the flag
+    //     std::cout << outputBits[i];
+    // std::cout << "\n";
     
     // Choosing error detection algorithm
     std::cout << chosenErrorDetecAlg;
@@ -190,7 +190,7 @@ void Receiver::linkLayer(int chosenErrorDetecAlg) {
             bitParityDecoding(false);
         break;
         default:
-            std::cerr << "[ATENÇÃO] Método de correção de erro inválido. Escolha entre 0 e 2!\n";
+            std::cerr << "[WARNING] Invalid method of correction. Choose between 0 and 2!\n";
     }
 
     std::cout << "\n";
@@ -200,11 +200,11 @@ void Receiver::linkLayer(int chosenErrorDetecAlg) {
         msgSize = outputBits.size();
 
     // Print the decoded message
-    if(msgSize%PARITY_RANGE != 0) {
-        std::cout << "ERROR: some bits are missing\n";
+    if(msgSize % PARITY_RANGE != 0) {
+        std::cout << "[ERROR] Some bits are missing\n";
         return;
     }
-    std::cout << "Message size: " << msgSize/PARITY_RANGE << " chars!\n";
+    // std::cout << "Message size: " << msgSize/PARITY_RANGE << " chars!\n";
     
     // Convert blocks of 8 bits in chars, and print each one
     int binToInt = 0;

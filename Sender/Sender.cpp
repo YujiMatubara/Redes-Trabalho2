@@ -6,6 +6,8 @@ Sender::~Sender(){}
 
 // Converts a String input into a string of 0 and 1 (it will work as a binary message)
 std::string Sender::stringToBinary(std::string str) {
+    std::cout << "Converting string to sequence of bits\n";
+
     std::string binRepresentation = "";
     std::string finalBinary = "";
 
@@ -28,7 +30,7 @@ std::string Sender::stringToBinary(std::string str) {
         // Reverse the string for the next steps
         std::reverse(binRepresentation.begin(), binRepresentation.end());
 
-        std::cout << "Done! Converted until '" << str[i] << "': " << binRepresentation << std::endl;
+        std::cout << "\tConverted until '" << str[i] << "': " << binRepresentation << std::endl;
 
         finalBinary += binRepresentation;
     }
@@ -46,7 +48,7 @@ void Sender::applicationLayer() {
     // Simulating converting from string to binary
     std::string binMsg = stringToBinary(message);
 
-    // Transform the string into a bool vector
+    // Transform the string into a bool vector (simulating bit stream)
     for (int i = 0; i < (int)binMsg.length(); i++)
         inputBits.push_back( (binMsg[i] == '1') ? 1 : 0 );
     
@@ -68,7 +70,7 @@ void Sender::CRC_32() {
     int crcSize = CRC_DIVISOR.size();
 
     if (crcSize == 0) {
-        std::cerr << "[ERRO] Não é possível usar CRC com divisor de tamanho 0!\n";
+        std::cerr << "[ERROR] Can't use CRC when CRC divisor's size is 0!\n";
         return;
     }
 
@@ -116,11 +118,11 @@ void Sender::CRC_32() {
 
     std::vector<bool> bitsCRC(crcSize-1);
 
-    std::cout << "Aux vector after CRC algo.:\n";
+    // std::cout << "Aux vector after CRC algo.:\n";
 
-    for (int i = 0; i < (int)aux.size(); i++)
-        std::cout << aux[i];
-    std::cout << std::endl;
+    // for (int i = 0; i < (int)aux.size(); i++)
+    //     std::cout << aux[i];
+    // std::cout << std::endl;
 
     // crcSize-1 least significant bits are the ones we need to append to the message
     for (int i = 0; i < crcSize-1; i++) {
@@ -137,7 +139,7 @@ void Sender::CRC_32() {
     aux2.insert(aux2.end(), bitsCRC.begin(), bitsCRC.end());
     inputBits = aux2;
 
-    std::cout << "Bit sequence after CRC applied:\n";
+    std::cout << "Bit sequence with CRC bits applied:\n";
 
     for (int i = 0; i < (int)inputBits.size(); i++)
         std::cout << inputBits[i];
@@ -186,13 +188,8 @@ std::vector<bool> Sender::linkLayer(int chosenErrorDetecAlg) {
             bitParityEncoding(false);
         break;
         default:
-            std::cerr << "[ATENÇÃO] Método de correção de erro inválido. Escolha entre 0 e 2!\n";
+            std::cerr << "[WARNING] Invalid method of correction. Choose between 0 and 2!\n";
     }
-
-    std::cout << "Texto com encoding e sem frame\n";
-    for (int i = 0; i < (int)inputBits.size(); i++)
-        std::cout << inputBits[i];
-    std::cout << "\n";
 
     // Framing: inserting frameFlag to beginning and end of frame (variable size)
     std::vector<bool> finalFrame; // frame we'll send to physical layer
@@ -200,6 +197,11 @@ std::vector<bool> Sender::linkLayer(int chosenErrorDetecAlg) {
     finalFrame.insert(finalFrame.end(), frameFlag.begin(), frameFlag.end());
     finalFrame.insert(finalFrame.end(), inputBits.begin(), inputBits.end());
     finalFrame.insert(finalFrame.end(), frameFlag.begin(), frameFlag.end());
+
+    std::cout << "Final frame (with flag bits at the beginning and end of bit sequence):\n";
+    for (int i = 0; i < (int)finalFrame.size(); i++)
+        std::cout << finalFrame[i];
+    std::cout << "\n";
 
     // returning to send to "pyshical layer" (communicationPath)
     return finalFrame;
