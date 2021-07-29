@@ -169,12 +169,12 @@ std::string Receiver::linkLayer(int chosenErrorDetecAlg) {
 
     if (beginCheck.size() != endCheck.size()) { //when the flags are not equal in size, they are not equal in content
         std::cout << "Flags' sizes not equal.\n";
-        return NULL;
+        return "";
     }
     for (int i = 0; i < beginCheck.size(); i++) { // if the size are the same check if the content is the same
         if (beginCheck[i] != endCheck[i]) {
             std::cout << "Error when compating flags.\n";
-            return NULL;
+            return "";
         }
     }
     std::cout << "No problems with the framing bits.\n";

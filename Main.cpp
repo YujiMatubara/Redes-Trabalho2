@@ -6,7 +6,6 @@
 /* Simulates the whole interaction between sender and receiver sending a binary message with
 some flags to verification */
 
-
 int main(int argc, char const *argv[]) {
     Sender sender;
     Receiver receiver;
