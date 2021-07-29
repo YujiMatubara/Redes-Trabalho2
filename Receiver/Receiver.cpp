@@ -23,7 +23,7 @@ void Receiver::applicationLayer(std::vector<bool> outputBits){
 
 // Decoding for even and odd parity, set with the parameter eventBitParity
 void Receiver::bitParityDecoding(bool evenBitParity = true){
-    std::cout << "Message arrived at B without errors!\n";  //if the message was reached
+    // std::cout << "Message arrived at B!\n";  //if the message was reached
 
     std::vector<std::vector<bool>> errorGroups;
     int bitSum = 0,errors = 0;
