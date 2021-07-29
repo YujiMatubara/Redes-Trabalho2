@@ -5,13 +5,13 @@ Receiver::Receiver(){}
 Receiver::~Receiver(){}
 
 //read the message
-void Receiver::applicationLayer(std::vector<bool> outputBits){
+void Receiver::decodingMessage(std::vector<bool> outputBits){
     this->outputBits = outputBits;
 
     std::cout << "Message received:\n";
 
     if (outputBits.size() <= 0)  //if the message is empty
-        std::cerr << "[Erro] Não há mensagem.";
+        std::cerr << "[ERROR] There's no message...";
     else    //if the message is reached, shows it
         for(bool outputBit : outputBits){   //iterates in outputBits
             std::cout << (outputBit ? "1" : "0"); //if true print 1, else (false) print 0
@@ -49,7 +49,7 @@ void Receiver::bitParityDecoding(bool evenBitParity = true){
     errors += block ? 1 : 0;
     int curParityPos;
     std::string message = "";   //initializate a null string
-    std::cout << "Os blocos com erros existentes estão em vermelho e os corretos em verde. Os bits de paridade estão em branco:\n";
+    std::cout << "Blocks with errors are in red and the correct ones are in green. Parity bits are in white.\n";
     for(int i=0;i<(int)wrongBlocks.size();i++){
         message += (wrongBlocks.at(i) ? "\x1B[31m" : "\x1B[32m" );
         for(int bitPos = i*addedParityRange;bitPos<(i+1)*addedParityRange - 1; bitPos++){
@@ -143,7 +143,18 @@ std::string Receiver::getColoredMessage(std::string sentMessage){
     return coloredMessage;
 }
 
-void Receiver::linkLayer(int chosenErrorDetecAlg) {
+void Receiver::applicationLayer(std::string receivedMessage) {
+    if (receivedMessage.empty()) {
+        std::cout << "[ERRO] Error when displaying message!";
+        return;
+    }
+
+    std::cout << "+=====================================================+\n";
+    std::cout << "| Message received: " << receivedMessage << std::endl;
+    std::cout << "+=====================================================+\n";
+}
+
+std::string Receiver::linkLayer(int chosenErrorDetecAlg) {
     // Framing: removing frameFlag to beginning and end of frame (variable size)
     // Removes flags from begining and end
 
@@ -158,12 +169,12 @@ void Receiver::linkLayer(int chosenErrorDetecAlg) {
 
     if (beginCheck.size() != endCheck.size()) { //when the flags are not equal in size, they are not equal in content
         std::cout << "Flags' sizes not equal.\n";
-        return;
+        return NULL;
     }
     for (int i = 0; i < beginCheck.size(); i++) { // if the size are the same check if the content is the same
         if (beginCheck[i] != endCheck[i]) {
             std::cout << "Error when compating flags.\n";
-            return;
+            return NULL;
         }
     }
     std::cout << "No problems with the framing bits.\n";
@@ -202,7 +213,7 @@ void Receiver::linkLayer(int chosenErrorDetecAlg) {
     // Print the decoded message
     if(msgSize % PARITY_RANGE != 0) {
         std::cout << "[ERROR] Some bits are missing\n";
-        return;
+        return NULL;
     }
     // std::cout << "Message size: " << msgSize/PARITY_RANGE << " chars!\n";
     
@@ -227,7 +238,7 @@ void Receiver::linkLayer(int chosenErrorDetecAlg) {
         else
             pot /= 2;
     }
-    std::cout << receivedMessage << "\n";
+    // std::cout << receivedMessage << "\n";
 
-    // returning to receive to "application layer"
+    return receivedMessage;
 }

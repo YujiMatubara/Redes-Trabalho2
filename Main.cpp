@@ -34,10 +34,13 @@ int main(int argc, char const *argv[]) {
 
     // The receiver functions starts here
     std::cout << "==== RECEIVER ===\n";
-    receiver.applicationLayer(senderFrame);
-    receiver.linkLayer(encodingType);
+    receiver.decodingMessage(senderFrame);
+    std::string decodedMessage = receiver.linkLayer(encodingType);
+    receiver.applicationLayer(decodedMessage);
+
+    std::cout << "\n============ SIMULATION ENDED ============\n";
     std::string sentMessage = sender.getMessage();
     std::string receivedMessage = receiver.getColoredMessage(sentMessage);
-    std::cout << "\nMensagens:\n\tEnviada: " << sentMessage << "\n\tRecebida: " << receivedMessage << std::endl;
+    std::cout << "\nMessages:\n\tSent: " << sentMessage << "\n\tReceived: " << receivedMessage << std::endl;
     return 0;
 }

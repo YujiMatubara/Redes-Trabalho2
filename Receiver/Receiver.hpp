@@ -11,9 +11,10 @@ class Receiver {
     Receiver();
     ~Receiver();
     std::string getColoredMessage(std::string sentMessage);
-    void applicationLayer(std::vector<bool> outputBits);
+    void decodingMessage(std::vector<bool> outputBits);
     void bitParityDecoding(bool evenBitParity);
-    void linkLayer(int chosenErrorDetecAlg);
+    std::string linkLayer(int chosenErrorDetecAlg);
+    void applicationLayer(std::string receivedMessage);
     int CRC_32(std::vector<bool> outputBits);
     
 };

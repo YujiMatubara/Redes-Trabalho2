@@ -42,7 +42,7 @@ std::string Sender::stringToBinary(std::string str) {
 void Sender::applicationLayer() {
     std::string message;
 
-    std::cout << "Digite uma mensagem:\n>> ";
+    std::cout << "Type your message (without spaces):\n>> ";
     std::cin >> message;
 
     // Simulating converting from string to binary
